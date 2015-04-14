@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Custom Admin Language
-Version: 2.0
+Version: 2.0.0
 */
 
 class Custom_Admin_Language {
