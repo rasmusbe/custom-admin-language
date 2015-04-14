@@ -1,0 +1,16 @@
+{
+  "name": "rasmusbe/custom-admin-language",
+  "type": "wordpress-muplugin",
+  "description": "Makes it possible to use another language in admin",
+  "homepage": "https://github.com/rasmusbe/custom-admin-language",
+  "keywords": ["wordpress","plugin"],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "authors": [
+    {
+      "name": "Rasmus Bengtsson",
+      "role": "Developer"
+    }
+  ]
+}
