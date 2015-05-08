@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Admin Language
 Author: Rasmus Bengtsson
-Version: 2.1.1
+Version: 2.2.0
 */
 
 class Custom_Admin_Language {
@@ -12,6 +12,8 @@ class Custom_Admin_Language {
 		if ( is_admin() && ! is_network_admin() ) {
 			add_filter( 'locale', array( $this, 'set_language' ), 1 );
 			add_action( 'admin_init', array( $this, 'site_language_fix' ), 1 );
+
+			add_filter( 'woocommerce_debug_tools' , array( $this, 'woocommerce_language_button' ) );
 		}
 	}
 
@@ -46,10 +48,11 @@ class Custom_Admin_Language {
 			return TRUE;
 		}
 
-		// Do not translate WooCommerce when creating pages
+		// Do not translate WooCommerce when creating pages or upgrade langs
 		if (
 			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-settings' && !empty( $_GET['install_woocommerce_pages'] ) ) ||
-			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && !empty( $_GET['action'] && $_GET['action'] == 'install_pages' ) )
+			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && !empty( $_GET['action'] && $_GET['action'] == 'install_pages' ) ) ||
+			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && !empty( $_GET['action'] && $_GET['action'] == 'translation_upgrade' ) )
 		) {
 			return TRUE;
 		}
@@ -106,6 +109,17 @@ class Custom_Admin_Language {
 	function site_language_fix_2() {
 		$this->return_original = FALSE;
 		load_default_textdomain( get_locale() );
+	}
+
+	function woocommerce_language_button( $tools ) {
+		if ( !isset( $tools['translation_upgrade'] ) ) {
+			$tools['translation_upgrade'] = array(
+				'name'    => __( 'Translation Upgrade', 'woocommerce' ),
+				'button'  => __( 'Force Translation Upgrade', 'woocommerce' ),
+				'desc'    => __( '<strong class="red">Note:</strong> This option will force the translation upgrade for your language if a translation is available.', 'woocommerce' ),
+			);
+		}
+		return $tools;
 	}
 }
 new Custom_Admin_Language;
