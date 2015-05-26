@@ -2,11 +2,11 @@
 /*
 Plugin Name: Custom Admin Language
 Author: Rasmus Bengtsson
-Version: 2.2.0
+Version: 2.3.0
 */
 
 class Custom_Admin_Language {
-	var $return_original = FALSE;
+	var $return_original = false;
 
 	function __construct() {
 		if ( is_admin() && ! is_network_admin() ) {
@@ -40,40 +40,44 @@ class Custom_Admin_Language {
 			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins' ) ) );
 		}
 
-		if ( !in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', $active_plugins ) ) ) {
-			return FALSE;
+		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', $active_plugins ) ) ) {
+			return false;
 		}
 
 		if ( function_exists( 'is_ajax' ) && is_ajax() ) {
-			return TRUE;
+			return true;
+		}
+
+		if ( isset($_POST['wc_order_action']) ) {
+			return true;
 		}
 
 		// Do not translate WooCommerce when creating pages or upgrade langs
 		if (
-			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-settings' && !empty( $_GET['install_woocommerce_pages'] ) ) ||
-			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && !empty( $_GET['action'] && $_GET['action'] == 'install_pages' ) ) ||
-			( !empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && !empty( $_GET['action'] && $_GET['action'] == 'translation_upgrade' ) )
+			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-settings' && ! empty( $_GET['install_woocommerce_pages'] ) ) ||
+			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] && $_GET['action'] == 'install_pages' ) ) ||
+			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] && $_GET['action'] == 'translation_upgrade' ) )
 		) {
-			return TRUE;
+			return true;
 		}
 
 		// Set WooCommerce permalinks if not set
-		$this->return_original = TRUE;
+		$this->return_original = true;
 		$permalinks = get_option( 'woocommerce_permalinks' );
 
 		if ( empty( $permalinks ) ) {
 			$permalinks = array();
 		}
 
-		$was_loaded = FALSE;
+		$was_loaded = false;
 
 		if ( empty( $permalinks['category_base'] ) || empty( $permalinks['tag_base'] ) ) {
 
 			if ( is_textdomain_loaded( 'woocommerce' ) ) {
-				$was_loaded = TRUE;
+				$was_loaded = true;
 			}
 
-			load_plugin_textdomain( 'woocommerce', false, WP_PLUGIN_DIR . "/woocommerce/i18n/languages" );
+			load_plugin_textdomain( 'woocommerce', false, WP_PLUGIN_DIR . '/woocommerce/i18n/languages' );
 
 			if ( empty( $permalinks['category_base'] ) ) {
 				$permalinks['category_base'] = _x( 'product-category', 'slug', 'woocommerce' );
@@ -89,10 +93,10 @@ class Custom_Admin_Language {
 
 		}
 
-		$this->return_original = FALSE;
+		$this->return_original = false;
 
 		if ( $was_loaded ) {
-			load_plugin_textdomain( 'woocommerce', false, WP_PLUGIN_DIR . "/woocommerce/i18n/languages" );
+			load_plugin_textdomain( 'woocommerce', false, WP_PLUGIN_DIR . '/woocommerce/i18n/languages' );
 		}
 	}
 
@@ -102,17 +106,17 @@ class Custom_Admin_Language {
 	}
 
 	function site_language_fix_1() {
-		$this->return_original = TRUE;
+		$this->return_original = true;
 		load_default_textdomain( get_locale() );
 	}
 
 	function site_language_fix_2() {
-		$this->return_original = FALSE;
+		$this->return_original = false;
 		load_default_textdomain( get_locale() );
 	}
 
 	function woocommerce_language_button( $tools ) {
-		if ( !isset( $tools['translation_upgrade'] ) ) {
+		if ( ! isset( $tools['translation_upgrade'] ) ) {
 			$tools['translation_upgrade'] = array(
 				'name'    => __( 'Translation Upgrade', 'woocommerce' ),
 				'button'  => __( 'Force Translation Upgrade', 'woocommerce' ),
