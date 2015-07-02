@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Admin Language
 Author: Rasmus Bengtsson
-Version: 2.3.0
+Version: 2.4.0
 */
 
 class Custom_Admin_Language {
@@ -10,23 +10,20 @@ class Custom_Admin_Language {
 
 	function __construct() {
 		if ( is_admin() && ! is_network_admin() ) {
-			add_filter( 'locale', array( $this, 'set_language' ), 1 );
-			add_action( 'admin_init', array( $this, 'site_language_fix' ), 1 );
+			add_filter( 'locale', [ $this, 'set_language' ], 1 );
+			add_action( 'admin_init', [ $this, 'site_language_fix' ], 1 );
 
-			add_filter( 'woocommerce_debug_tools' , array( $this, 'woocommerce_language_button' ) );
+			add_filter( 'woocommerce_debug_tools' , [ $this, 'woocommerce_language_button' ] );
 		}
 	}
 
 	function set_language( $lang ) {
-		global $locale;
 		if ( $this->return_original || $this->fix_woocommerce() ) {
 			$lang = get_option( 'WPLANG', $lang );
-			$locale = $lang;
 			return $lang;
 		}
 
 		$lang = defined( 'ADMIN_LANG' ) ? ADMIN_LANG : 'sv_SE';
-		$locale = $lang;
 		return $lang;
 	}
 
@@ -48,15 +45,17 @@ class Custom_Admin_Language {
 			return true;
 		}
 
-		if ( isset($_POST['wc_order_action']) ) {
+		// @codingStandardsIgnoreStart - Ignore rule against processing postdata without nonce
+		if ( isset( $_POST['wc_order_action'] ) ) {
 			return true;
 		}
+		// @codingStandardsIgnoreEnd
 
 		// Do not translate WooCommerce when creating pages or upgrade langs
 		if (
 			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-settings' && ! empty( $_GET['install_woocommerce_pages'] ) ) ||
-			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] && $_GET['action'] == 'install_pages' ) ) ||
-			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] && $_GET['action'] == 'translation_upgrade' ) )
+			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] == 'install_pages' ) ||
+			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] == 'translation_upgrade' )
 		) {
 			return true;
 		}
@@ -66,7 +65,7 @@ class Custom_Admin_Language {
 		$permalinks = get_option( 'woocommerce_permalinks' );
 
 		if ( empty( $permalinks ) ) {
-			$permalinks = array();
+			$permalinks = [];
 		}
 
 		$was_loaded = false;
@@ -101,8 +100,8 @@ class Custom_Admin_Language {
 	}
 
 	function site_language_fix() {
-		add_settings_field( 'site_language_fix_1', '', array( $this, 'site_language_fix_1' ), 'general', 'default' );
-		add_settings_section( 'site_language_fix_2', '', array( $this, 'site_language_fix_2' ), 'general' );
+		add_settings_field( 'site_language_fix_1', '', [ $this, 'site_language_fix_1' ], 'general', 'default' );
+		add_settings_section( 'site_language_fix_2', '', [ $this, 'site_language_fix_2' ], 'general' );
 	}
 
 	function site_language_fix_1() {
@@ -117,11 +116,11 @@ class Custom_Admin_Language {
 
 	function woocommerce_language_button( $tools ) {
 		if ( ! isset( $tools['translation_upgrade'] ) ) {
-			$tools['translation_upgrade'] = array(
+			$tools['translation_upgrade'] = [
 				'name'    => __( 'Translation Upgrade', 'woocommerce' ),
 				'button'  => __( 'Force Translation Upgrade', 'woocommerce' ),
 				'desc'    => __( '<strong class="red">Note:</strong> This option will force the translation upgrade for your language if a translation is available.', 'woocommerce' ),
-			);
+			];
 		}
 		return $tools;
 	}
