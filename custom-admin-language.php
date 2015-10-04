@@ -1,14 +1,26 @@
 <?php
-/*
-Plugin Name: Custom Admin Language
-Author: Rasmus Bengtsson
-Version: 2.4.0
-*/
+
+/**
+ * Plugin Name: Custom Admin Language
+ * Plugin URI: https://github.com/rasmusbe/custom-admin-language
+ * Description: Makes it possible to use another language in admin.
+ * Author: Rasmus Bengtsson
+ * Version: 2.4.0
+ */
 
 class Custom_Admin_Language {
-	var $return_original = false;
 
-	function __construct() {
+	/**
+	 * Determine if return url should be returned or not.
+	 *
+	 * @var bool
+	 */
+	protected $return_original = false;
+
+	/**
+	 * The constructor.
+	 */
+	public function __construct() {
 		if ( is_admin() && ! is_network_admin() ) {
 			add_filter( 'locale', [ $this, 'set_language' ], 1 );
 			add_action( 'admin_init', [ $this, 'site_language_fix' ], 1 );
@@ -17,20 +29,24 @@ class Custom_Admin_Language {
 		}
 	}
 
-	function set_language( $lang ) {
+	/**
+	 * Set language.
+	 *
+	 * @param string $lang
+	 */
+	public function set_language( $lang ) {
 		if ( $this->return_original || $this->fix_woocommerce() ) {
-			$lang = get_option( 'WPLANG', $lang );
-			return $lang;
+			return get_option( 'WPLANG', $lang );
 		}
 
-		$lang = defined( 'ADMIN_LANG' ) ? ADMIN_LANG : 'sv_SE';
-		return $lang;
+		return defined( 'ADMIN_LANG' ) ? ADMIN_LANG : 'sv_SE';
 	}
 
-	function fix_woocommerce() {
-		/**
-		 * Check if WooCommerce is active
-		 * */
+	/**
+	 * Fix WooCommerce so it can handle custom admin language.
+	 */
+	public function fix_woocommerce() {
+		// Check if WooCommerce is active.
 		$active_plugins = get_option( 'active_plugins' );
 
 		if ( is_multisite() ) {
@@ -99,22 +115,40 @@ class Custom_Admin_Language {
 		}
 	}
 
-	function site_language_fix() {
+	/**
+	 * Add settings fields for language fixes.
+	 */
+	public function site_language_fix() {
 		add_settings_field( 'site_language_fix_1', '', [ $this, 'site_language_fix_1' ], 'general', 'default' );
 		add_settings_section( 'site_language_fix_2', '', [ $this, 'site_language_fix_2' ], 'general' );
 	}
 
-	function site_language_fix_1() {
+	/**
+	 * Site language fix 1.
+	 * Sets the `return_original` to true.
+	 */
+	public function site_language_fix_1() {
 		$this->return_original = true;
 		load_default_textdomain( get_locale() );
 	}
 
-	function site_language_fix_2() {
+	/**
+	 * Site language fix 2.
+	 * Sets the `return_original` to false.
+	 */
+	public function site_language_fix_2() {
 		$this->return_original = false;
 		load_default_textdomain( get_locale() );
 	}
 
-	function woocommerce_language_button( $tools ) {
+	/**
+	 * Fix WooCommerce language buttons.
+	 *
+	 * @param  array $tools
+	 *
+	 * @return array
+	 */
+	public function woocommerce_language_button( array $tools ) {
 		if ( ! isset( $tools['translation_upgrade'] ) ) {
 			$tools['translation_upgrade'] = [
 				'name'    => __( 'Translation Upgrade', 'woocommerce' ),
@@ -122,7 +156,10 @@ class Custom_Admin_Language {
 				'desc'    => __( '<strong class="red">Note:</strong> This option will force the translation upgrade for your language if a translation is available.', 'woocommerce' ),
 			];
 		}
+
 		return $tools;
 	}
+
 }
+
 new Custom_Admin_Language;
