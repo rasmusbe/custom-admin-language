@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Custom Admin Language
  * Plugin URI: https://github.com/rasmusbe/custom-admin-language
@@ -8,6 +7,9 @@
  * Version: 2.4.0
  */
 
+/**
+ * Custom_Admin_Language class
+ */
 class Custom_Admin_Language {
 
 	/**
@@ -45,7 +47,7 @@ class Custom_Admin_Language {
 
 	/**
 	 * Fix for WooCommerce so it can handle custom admin language without breaking non-admin pages.
-	 * 
+	 *
 	 * @return bool   If true set_language will use site language, otherwise custom language.
 	 */
 	public function fix_woocommerce() {
@@ -56,7 +58,7 @@ class Custom_Admin_Language {
 			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins' ) ) );
 		}
 
-		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', $active_plugins ) ) ) {
+		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', $active_plugins ), true ) ) {
 			return false;
 		}
 
@@ -72,9 +74,9 @@ class Custom_Admin_Language {
 
 		// Do not translate WooCommerce when creating pages or upgrade langs
 		if (
-			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-settings' && ! empty( $_GET['install_woocommerce_pages'] ) ) ||
-			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] == 'install_pages' ) ||
-			( ! empty( $_GET['page'] ) && $_GET['page'] == 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] == 'translation_upgrade' )
+			( ! empty( $_GET['page'] ) && $_GET['page'] === 'wc-settings' && ! empty( $_GET['install_woocommerce_pages'] ) ) ||
+			( ! empty( $_GET['page'] ) && $_GET['page'] === 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] === 'install_pages' ) ||
+			( ! empty( $_GET['page'] ) && $_GET['page'] === 'wc-status' && ! empty( $_GET['action'] ) && $_GET['action'] === 'translation_upgrade' )
 		) {
 			return true;
 		}
