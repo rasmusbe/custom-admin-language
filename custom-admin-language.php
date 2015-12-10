@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/rasmusbe/custom-admin-language
  * Description: Makes it possible to use another language in admin.
  * Author: Rasmus Bengtsson
- * Version: 2.4.0
+ * Version: 2.5.0
  */
 
 /**
@@ -62,7 +62,7 @@ class Custom_Admin_Language {
 			return false;
 		}
 
-		if ( function_exists( 'is_ajax' ) && is_ajax() ) {
+		if ( ( function_exists( 'is_ajax' ) && is_ajax() ) || ! empty( $_GET['wc-ajax'] ) ) {
 			return true;
 		}
 
